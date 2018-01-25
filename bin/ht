@@ -3,10 +3,17 @@
 require "hathitext"
 require "optparse"
 
+options = {}
 
 OptionParser.new do |opts|
   opts.banner = "Usage: ht [options] ID"
 
+  opts.on("-bSEP", "--break=SEP", "Indicate page breaks with an empty line (LINE) or dashes (DASH)") do |b|
+    if b.upcase == "LINE" or b.upcase == "DASH"
+      options[:break] = b.upcase
+    end
+  end
+  
   opts.on("-h", "--help", "Prints this help") do
     puts opts
     exit
@@ -23,12 +30,25 @@ $stdout.sync = true
 
 nextUrl = "/cgi/ssd?id=%s" % [id]
 
+first = true
+
 while not nextUrl.nil?
   begin
     page = Hathitext.fetchText(nextUrl)
     nav = page.css("a").first.parent
     nextUrl = Hathitext.nextLink(nav)
     nav.children.remove
+
+    if first
+      first = false
+    else
+      if options[:break] == "DASH"
+        puts '-' * 40
+      elsif options[:break] == "LINE"
+        puts ""
+      end
+    end
+
     puts page.text
   rescue Hathitext::HTTPError => e
     puts e
