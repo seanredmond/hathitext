@@ -1,0 +1,39 @@
+#!/usr/bin/env ruby
+
+require "hathitext"
+require "optparse"
+
+
+OptionParser.new do |opts|
+  opts.banner = "Usage: ht [options] ID"
+
+  opts.on("-h", "--help", "Prints this help") do
+    puts opts
+    exit
+  end
+end.parse!
+
+id = ARGV.first
+
+if id.nil?
+  exit
+end
+
+$stdout.sync = true
+
+nextUrl = "/cgi/ssd?id=%s" % [id]
+
+while not nextUrl.nil?
+  begin
+    page = Hathitext.fetchText(nextUrl)
+    nav = page.css("a").first.parent
+    nextUrl = Hathitext.nextLink(nav)
+    nav.children.remove
+    puts page.text
+  rescue Hathitext::HTTPError => e
+    puts e
+    exit
+  end
+end
+                     
+
