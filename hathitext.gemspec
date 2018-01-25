@@ -10,7 +10,7 @@ Gem::Specification.new do |spec|
   spec.email         = ["github-smr@sneakemail.com"]
 
   spec.summary       = %q{Utility to download publid domain text from HathiTrust}
-  spec.homepage      = "http://127.0.0.1"
+  spec.homepage      = "https://github.com/seanredmond/hathitext"
   spec.license       = "MIT"
 
   # Prevent pushing this gem to RubyGems.org. To allow pushes either set the 'allowed_push_host'
