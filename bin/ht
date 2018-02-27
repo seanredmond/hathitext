@@ -3,6 +3,8 @@
 require "hathitext"
 require "optparse"
 
+$stderr.sync = true
+
 options = {}
 
 OptionParser.new do |opts|
@@ -18,6 +20,10 @@ OptionParser.new do |opts|
     puts opts
     exit
   end
+
+  opts.on("-p", "Show progress") do |progress|
+    options[:progress] = true
+  end
 end.parse!
 
 id = ARGV.first
@@ -32,6 +38,7 @@ nextUrl = "/cgi/ssd?id=%s" % [id]
 
 first = true
 
+page_count = 1
 while not nextUrl.nil?
   begin
     page = Hathitext.fetchText(nextUrl)
@@ -39,6 +46,16 @@ while not nextUrl.nil?
     nextUrl = Hathitext.nextLink(nav)
     nav.children.remove
 
+    if options[:progress] == true
+      if page_count % 10 == 0
+        STDERR.print page_count
+      else
+        STDERR.print '.'
+      end
+    end
+
+    page_count += 1
+    
     if first
       first = false
     else
@@ -56,4 +73,4 @@ while not nextUrl.nil?
   end
 end
                      
-
+STDERR.puts
